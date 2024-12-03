@@ -8,52 +8,51 @@ CROSS_CC = aarch64-linux-gnu-gcc
 CROSS_CFLAGS = -Wall -I./src/inc
 CROSS_LDFLAGS = -static
 
-# Define source directories
-SRC_DIR_CORE = src/core
-SRC_DIR_INC = src/inc
+# Define source code directories
+SRC_DIR = src
 BUILD_DIR = build
 CROSS_BUILD_DIR = cross_build
 
-# Automatically find source files
-SRCS = $(wildcard $(SRC_DIR_CORE)/*.c)
-OBJS = $(patsubst $(SRC_DIR_CORE)/%.c,$(BUILD_DIR)/%.o,$(SRCS))
-CROSS_OBJS = $(patsubst $(SRC_DIR_CORE)/%.c,$(CROSS_BUILD_DIR)/%.o,$(SRCS))
+# Recursively find all source files (including .c files in subdirectories)
+SRCS = $(shell find $(SRC_DIR) -type f -name "*.c")
+OBJS = $(patsubst $(SRC_DIR)/%.c,$(BUILD_DIR)/%.o,$(SRCS))
+CROSS_OBJS = $(patsubst $(SRC_DIR)/%.c,$(CROSS_BUILD_DIR)/%.o,$(SRCS))
 
-# Define targets
-TARGET = combined_program
-TARGET_PROGRAM = $(BUILD_DIR)/${TARGET}
-CROSS_TARGET_PROGRAM = $(CROSS_BUILD_DIR)/${TARGET}
+# Define target files
+TARGET = main_program
+TARGET_PROGRAM = $(BUILD_DIR)/$(TARGET)
+CROSS_TARGET_PROGRAM = $(CROSS_BUILD_DIR)/$(TARGET)
 
 # Default target
 all: $(TARGET_PROGRAM) $(CROSS_TARGET_PROGRAM)
 
-# Build combined program
+# Build the target program
 $(TARGET_PROGRAM): $(OBJS)
-	@echo "Building default combined program..."
+	@echo "Building the default combined program..."
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(OBJS)
 
-# Cross-compile combined program
+# Cross-compile the target program
 $(CROSS_TARGET_PROGRAM): $(CROSS_OBJS)
-	@echo "Building cross-compiled combined program..."
+	@echo "Building the cross-compiled combined program..."
 	$(CROSS_CC) $(CROSS_CFLAGS) $(CROSS_LDFLAGS) -o $@ $(CROSS_OBJS)
 
-# Compile source files to object files
-$(BUILD_DIR)/%.o: $(SRC_DIR_CORE)/%.c
-	mkdir -p $(BUILD_DIR)
-	@echo "Compiling $<..."
+# Compile source files into object files
+$(BUILD_DIR)/%.o: $(SRC_DIR)/%.c
+	@mkdir -p $(dir $@)  # Create the directory for the target file
+	@echo "Compiling $< ..."
 	$(CC) $(CFLAGS) -c -o $@ $<
 
-# Compile source files to object files for cross-compilation
-$(CROSS_BUILD_DIR)/%.o: $(SRC_DIR_CORE)/%.c
-	mkdir -p $(CROSS_BUILD_DIR)
-	@echo "Cross-compiling $<..."
+# Cross-compile source files into object files
+$(CROSS_BUILD_DIR)/%.o: $(SRC_DIR)/%.c
+	@mkdir -p $(dir $@)  # Create the directory for the target file
+	@echo "Cross-compiling $< ..."
 	$(CROSS_CC) $(CROSS_CFLAGS) -c -o $@ $<
 
-# Clean up build files
+# Clean the build files
 clean:
-	@echo "Cleaning build directories..."
+	@echo "Cleaning the build directories..."
 	rm -rf $(BUILD_DIR)
 	rm -rf $(CROSS_BUILD_DIR)
 
-# Phony targets
+# Declare phony targets
 .PHONY: all clean

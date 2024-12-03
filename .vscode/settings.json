@@ -1,5 +1,10 @@
 {
     "files.associations": {
-        "gpio.h": "c"
+        "gpio.h": "c",
+        "common.h": "c",
+        "logger.h": "c",
+        "string.h": "c",
+        "errno.h": "c",
+        "time.h": "c"
     }
 }
