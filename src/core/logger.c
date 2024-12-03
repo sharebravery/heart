@@ -5,7 +5,7 @@
 #include <errno.h>
 #include "logger.h"
 #include "common.h"
-#include "utils.h"
+#include "time.h"
 
 void log_error(const char *fmt, ...)
 {
