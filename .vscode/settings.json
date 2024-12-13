@@ -5,6 +5,7 @@
         "logger.h": "c",
         "string.h": "c",
         "errno.h": "c",
-        "time.h": "c"
+        "time.h": "c",
+        "stat.h": "c"
     }
 }
